@@ -6,8 +6,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace DotNetAPI.Models
 {
+    // une catégorie est un objet qui représente une entrée dans la base de données
     public class Category
     {
+        // les propriétés de la catégorie
         public int Id { get; set; }
         [Required]
         public string Name { get; set; } = string.Empty;
@@ -15,6 +17,7 @@ namespace DotNetAPI.Models
         // Relation
         public ICollection<Article> Articles { get; set; } = new List<Article>();
 
+        // le constructeur de la catégorie
         public Category() { }
     }
 }

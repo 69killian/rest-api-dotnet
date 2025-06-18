@@ -6,7 +6,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace DotNetAPI.Models
 {
+    // un article est un objet qui représente une entrée dans la base de données
     public class Article {
+        // les propriétés de l'article  
         public int Id { get; set; }
         [Required]
         public string Title { get; set; } = string.Empty;
@@ -20,6 +22,7 @@ namespace DotNetAPI.Models
 
         public Article() { }
 
+        // le constructeur de l'article
         public Article(int id, string title, string content, DateTime createdAt)
         {
             Id = id;
