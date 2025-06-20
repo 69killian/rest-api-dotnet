@@ -1,3 +1,5 @@
+using System;
+
 namespace DotNetAPI.DTOs
 {
     public class ArticleResponseDto
