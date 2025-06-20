@@ -13,7 +13,7 @@ namespace DotNetAPI.Controllers
     // le controller pour les articles
     // le route est api/article
     // le ApiController est un attribut qui indique que la classe est un contrôleur API
-    [Route("api/article/{id}")]
+    [Route("api/[controller]")]
     [ApiController]
     public class ArticleController : ControllerBase
     {
@@ -28,7 +28,7 @@ namespace DotNetAPI.Controllers
         }
 
         // on récupère tous les articles
-        [HttpGet("/api/articles")]
+        [HttpGet]
         public IActionResult GetAllArticles()
         {
             var articles = _context.Articles
@@ -51,7 +51,7 @@ namespace DotNetAPI.Controllers
         }
 
         // on récupère les articles par id
-        [HttpGet]
+        [HttpGet("{id}")]
         public IActionResult GetArticleById(int id)
         {
             var article = _context.Articles
@@ -112,7 +112,7 @@ namespace DotNetAPI.Controllers
         }
 
         // on met à jour un article
-        [HttpPut]
+        [HttpPut("{id}")]
         public IActionResult UpdateArticle(int id, [FromBody] UpdateArticleDto updateArticleDto)
         {
             // Validation du modèle
@@ -145,6 +145,21 @@ namespace DotNetAPI.Controllers
 
             // on retourne l'article mis à jour
             return Ok(article);
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteArticle(int id)
+        {
+            var article = _context.Articles.FirstOrDefault(a => a.Id == id);
+            if (article == null)
+            {
+                return NotFound("Article non trouvé");
+            }
+
+            _context.Articles.Remove(article);
+            _context.SaveChanges();
+
+            return NoContent();
         }
     }
 }
