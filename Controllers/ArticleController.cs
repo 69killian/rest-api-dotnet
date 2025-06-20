@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DotNetAPI.Data;
-
+using DotNetAPI.DTOs;
+using DotNetAPI.Models;
 
 namespace DotNetAPI.Controllers
 {
@@ -32,6 +33,19 @@ namespace DotNetAPI.Controllers
         {
             var articles = _context.Articles
                 .Include(a => a.Category) // inclure la catégorie
+                .Select(a => new ArticleResponseDto
+                {
+                    Id = a.Id,
+                    Title = a.Title,
+                    Content = a.Content,
+                    CreatedAt = a.CreatedAt,
+                    CategoryId = a.CategoryId,
+                    Category = new CategoryDto
+                    {
+                        Id = a.Category.Id,
+                        Name = a.Category.Name
+                    }
+                })
                 .ToList();
             return Ok(articles);
         }
@@ -45,9 +59,56 @@ namespace DotNetAPI.Controllers
                 .FirstOrDefault(a => a.Id == id);
 
             if (article == null)
-                return NotFound();
+                return NotFound("Article non trouvé");
 
-            return Ok(article);
+            var articleResponse = new ArticleResponseDto
+            {
+                Id = article.Id,
+                Title = article.Title,
+                Content = article.Content,
+                CreatedAt = article.CreatedAt,
+                CategoryId = article.CategoryId,
+                Category = new CategoryDto
+                {
+                    Id = article.Category.Id,
+                    Name = article.Category.Name
+                }
+            };
+
+            return Ok(articleResponse);
+        }
+
+        [HttpPost]
+        public IActionResult CreateArticle([FromBody] CreateArticleDto createArticleDto)
+        {
+            // Validation du modèle
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // Vérification de l'existence de la catégorie
+            var categoryExists = _context.Categories.Any(c => c.Id == createArticleDto.CategoryId);
+            if (!categoryExists)
+            {
+                return BadRequest("La catégorie spécifiée n'existe pas");
+            }
+
+            // on crée un nouvel article
+            var newArticle = new Article
+            {
+                Title = createArticleDto.Title,
+                Content = createArticleDto.Content,
+                CategoryId = createArticleDto.CategoryId,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            // on ajoute l'article à la base de données
+            _context.Articles.Add(newArticle);
+            _context.SaveChanges();
+
+            // on retourne l'article créé
+            return CreatedAtAction(nameof(GetArticleById), new { id = newArticle.Id }, newArticle);
         }
     }
 }
