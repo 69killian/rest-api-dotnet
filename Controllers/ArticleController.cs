@@ -110,5 +110,41 @@ namespace DotNetAPI.Controllers
             // on retourne l'article créé
             return CreatedAtAction(nameof(GetArticleById), new { id = newArticle.Id }, newArticle);
         }
+
+        // on met à jour un article
+        [HttpPut]
+        public IActionResult UpdateArticle(int id, [FromBody] UpdateArticleDto updateArticleDto)
+        {
+            // Validation du modèle
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // on vérifie si l'article existe
+            var article = _context.Articles.FirstOrDefault(a => a.Id == id);
+            if (article == null)
+            {
+                return NotFound("Article non trouvé");
+            }
+
+            // Vérification de l'existence de la catégorie
+            var categoryExists = _context.Categories.Any(c => c.Id == updateArticleDto.CategoryId);
+            if (!categoryExists)
+            {
+                return BadRequest("La catégorie spécifiée n'existe pas");
+            }
+
+            // on met à jour les données de l'article
+            article.Title = updateArticleDto.Title;
+            article.Content = updateArticleDto.Content;
+            article.CategoryId = updateArticleDto.CategoryId;
+
+            // on enregistre les modifications
+            _context.SaveChanges();
+
+            // on retourne l'article mis à jour
+            return Ok(article);
+        }
     }
 }
