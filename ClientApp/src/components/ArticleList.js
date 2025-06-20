@@ -1,12 +1,12 @@
 import React from "react";
 
-const ArticleList = ({ articles, onEdit, onDelete, search, setSearch, filterCategory, setFilterCategory, categories }) => {
+const ArticleList = ({ articles, onEdit, onDelete, search, setSearch, filterCategory, setFilterCategory, categories, isLoading }) => {
   // Vérification que articles existe et est un tableau
   if (!articles || !Array.isArray(articles)) {
     return (
       <div className="bg-[#232336] rounded-2xl shadow-xl p-8">
         <div className="text-center py-8 text-gray-400">
-          Chargement des articles...
+          {isLoading ? "Chargement des articles..." : "Aucun article disponible"}
         </div>
       </div>
     );
@@ -44,7 +44,7 @@ const ArticleList = ({ articles, onEdit, onDelete, search, setSearch, filterCate
           </select>
         </div>
         <div className="text-center py-8 text-gray-400">
-          Aucun article trouvé.
+          {isLoading ? "Chargement..." : "Aucun article trouvé."}
         </div>
       </div>
     );
